@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.ssafy.luckyweeky.schedule.domain.repository.MainScheduleMapper">
+
+    <!-- INSERT: 대일정을 추가 -->
+    <insert id="insertMainSchedule" parameterType="mainScheduleEntity">
+        INSERT INTO MainSchedule (
+            main_schedule_id,
+            user_id,
+            title,
+            start_time,
+            end_time,
+            color,
+            created_at,
+            updated_at
+        ) VALUES (
+                     #{mainScheduleId},
+                     #{userId},
+                     #{title},
+                     #{startTime},
+                     #{endTime},
+                     #{color},
+                     CURRENT_TIMESTAMP,
+                     CURRENT_TIMESTAMP
+                 )
+    </insert>
+
+    <!-- SELECT: 특정 ID의 대일정을 조회 -->
+    <select id="selectMainScheduleById" parameterType="long" resultType="mainScheduleEntity">
+        SELECT
+            main_schedule_id AS mainScheduleId,
+            user_id AS userId,
+            title,
+            start_time AS startTime,
+            end_time AS endTime,
+            color,
+            created_at AS createdAt,
+            updated_at AS updatedAt
+        FROM MainSchedule
+        WHERE main_schedule_id = #{mainScheduleId}
+    </select>
+
+    <!-- SELECT: 특정 유저의 모든 대일정을 조회 -->
+    <select id="selectMainSchedulesByUserId" parameterType="long" resultType="mainScheduleEntity">
+        SELECT
+            main_schedule_id AS mainScheduleId,
+            user_id AS userId,
+            title,
+            start_time AS startTime,
+            end_time AS endTime,
+            color,
+            created_at AS createdAt,
+            updated_at AS updatedAt
+        FROM MainSchedule
+        WHERE user_id = #{userId}
+        ORDER BY start_time ASC
+    </select>
+
+    <!-- UPDATE: 대일정 수정 -->
+    <update id="updateMainSchedule" parameterType="mainScheduleEntity">
+        UPDATE MainSchedule
+        SET
+            title = #{title},
+            start_time = #{startTime},
+            end_time = #{endTime},
+            color = #{color},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE main_schedule_id = #{mainScheduleId}
+    </update>
+
+    <!-- DELETE: 대일정 삭제 -->
+    <delete id="deleteMainSchedule" parameterType="long">
+        DELETE FROM MainSchedule
+        WHERE main_schedule_id = #{mainScheduleId}
+    </delete>
+
+    <!-- MainSchedule 조회 -->
+    <select id="selectMainSchedulesByDateRange" parameterType="Map" resultType="mainScheduleEntity">
+        SELECT
+            main_schedule_id AS mainScheduleId,
+            user_id AS userId,
+            title,
+            start_time AS startTime,
+            end_time AS endTime,
+            color,
+            created_at AS createdAt,
+            updated_at AS updatedAt
+        FROM MainSchedule
+        WHERE
+        user_id = #{userId}
+        AND (
+        (start_time BETWEEN #{startDate} AND #{endDate})
+        OR
+        (end_time BETWEEN #{startDate} AND #{endDate})
+        )
+        ORDER BY start_time ASC
+    </select>
+</mapper>

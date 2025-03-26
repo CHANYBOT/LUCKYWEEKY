@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+    <bean class="io.ssafy.luckyweeky.user.presentation.UserController" id="aB12Xz"/>
+    <bean class="io.ssafy.luckyweeky.schedule.presentation.controller.ScheduleController" id="UAKRPCjN"/>
+    <bean class="io.ssafy.luckyweeky.scheduleAi.presentation.ScheduleAiController" id="qwDioSA"/>
+</beans>

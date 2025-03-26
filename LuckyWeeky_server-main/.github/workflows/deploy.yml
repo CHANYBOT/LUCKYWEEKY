@@ -1,0 +1,87 @@
+name: Java Servlet CI/CD Workflow
+
+on:
+  push:
+    branches:
+      - dev
+
+env:
+  REGION: ${{ secrets.REGION }}
+  ECS_CLUSTER: luckyweeky-ecs-cluster
+  SERVICE_NAME: luckyweeky-service
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build with Maven (Skip Tests)
+        run: mvn clean package -DskipTests
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build and Push Docker Image
+        run: |
+          TAG=${{ github.sha }}
+          IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/luckyweeky-server
+          docker build -t $IMAGE_NAME:${TAG} -t $IMAGE_NAME:latest .
+          docker push $IMAGE_NAME:${TAG}
+          docker push $IMAGE_NAME:latest
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Update Task Definition
+        run: |
+          TAG=${{ github.sha }}
+          IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/luckyweeky-server
+          echo "Updating Task Definition with IMAGE: $IMAGE_NAME:$TAG"
+
+          # Using jq to update the image field
+          jq '.containerDefinitions[0].image = "'$IMAGE_NAME:$TAG'"' ecs-task-definition.json > ecs-task-definition-updated.json
+          sed -i '/"taskRoleArn":/d' ecs-task-definition-updated.json
+
+      - name: Verify Updated Task Definition
+        run: |
+          echo "Updated Task Definition:"
+          cat ecs-task-definition-updated.json
+
+      - name: Register Task Definition
+        id: register_task_definition
+        run: |
+          TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://ecs-task-definition-updated.json \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text \
+            --region $REGION)
+          echo "TASK_DEF_ARN=$TASK_DEF_ARN" >> $GITHUB_ENV
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          REGION: ${{ secrets.REGION }}
+
+      - name: Update ECS Service
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $SERVICE_NAME \
+            --task-definition $TASK_DEF_ARN \
+            --region ${{ secrets.REGION }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          TASK_DEF_ARN: ${{ env.TASK_DEF_ARN }}

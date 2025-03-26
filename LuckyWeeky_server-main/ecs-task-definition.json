@@ -1,0 +1,34 @@
+{
+  "family": "luckyweeky-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::397064606679:role/luckyweeky-ecs-task-execution-role",
+  "containerDefinitions": [
+    {
+      "name": "app",
+      "image": "law10000hours/luckyweeky-server:${TAG}",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8080
+        }
+      ],
+      "secrets": [
+        {
+          "name": "LUCKYWEEKY_ENV_VARS",
+          "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:397064606679:secret:luckyweeky-env-vars-eb8zE2"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/luckyweeky",
+          "awslogs-region": "ap-northeast-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}

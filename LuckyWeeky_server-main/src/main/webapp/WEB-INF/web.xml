@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+
+
+    <!-- Listener 등록 -->
+    <listener>
+        <listener-class>io.ssafy.luckyweeky.common.env.SecretManagerContextListener</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>DispatcherServlet</servlet-name>
+        <servlet-class>io.ssafy.luckyweeky.common.DispatcherServlet</servlet-class>
+        <multipart-config>
+            <max-file-size>10485760</max-file-size> <!-- 파일 최대 크기: 10MB -->
+            <max-request-size>52428800</max-request-size> <!-- 요청 최대 크기: 50MB -->
+            <file-size-threshold>1048576</file-size-threshold> <!-- 메모리 임계값: 1MB -->
+        </multipart-config>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DispatcherServlet</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <filter>
+        <filter-name>CORSFilter</filter-name>
+        <filter-class>io.ssafy.luckyweeky.common.filter.CORSFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>CORSFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter>
+        <filter-name>JWTFilter</filter-name>
+        <filter-class>io.ssafy.luckyweeky.common.filter.JwtAuthenticationFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>JWTFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+</web-app>

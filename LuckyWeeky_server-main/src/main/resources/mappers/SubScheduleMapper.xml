@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.ssafy.luckyweeky.schedule.domain.repository.SubScheduleMapper">
+
+    <!-- INSERT: 소일정을 추가 -->
+    <insert id="insertSubSchedule" parameterType="subScheduleEntity">
+        INSERT INTO SubSchedule (
+            sub_schedule_id,
+            main_schedule_id,
+            title,
+            description,
+            start_time,
+            end_time,
+            is_completed,
+            created_at,
+            updated_at
+        ) VALUES (
+                     #{subScheduleId},
+                     #{mainScheduleId},
+                     #{title},
+                     #{description},
+                     #{startTime},
+                     #{endTime},
+                     #{isCompleted},
+                     CURRENT_TIMESTAMP,
+                     CURRENT_TIMESTAMP
+                 )
+    </insert>
+
+    <!-- SELECT: 특정 소일정을 조회 -->
+    <select id="selectSubScheduleById" parameterType="long" resultType="subScheduleEntity">
+        SELECT
+            sub_schedule_id AS subScheduleId,
+            main_schedule_id AS mainScheduleId,
+            title,
+            description,
+            start_time AS startTime,
+            end_time AS endTime,
+            is_completed AS isCompleted,
+            created_at AS createdAt,
+            updated_at AS updatedAt
+        FROM SubSchedule
+        WHERE sub_schedule_id = #{subScheduleId}
+    </select>
+
+    <!-- SELECT: 특정 대일정에 속한 모든 소일정을 조회 -->
+    <select id="selectSubSchedulesByMainScheduleId" parameterType="long" resultType="subScheduleEntity">
+        SELECT
+            sub_schedule_id AS subScheduleId,
+            main_schedule_id AS mainScheduleId,
+            title,
+            description,
+            start_time AS startTime,
+            end_time AS endTime,
+            is_completed AS isCompleted,
+            created_at AS createdAt,
+            updated_at AS updatedAt
+        FROM SubSchedule
+        WHERE main_schedule_id = #{mainScheduleId}
+        ORDER BY start_time ASC
+    </select>
+
+    <!-- UPDATE: 소일정 수정 -->
+    <update id="updateSubSchedule" parameterType="subScheduleEntity">
+        UPDATE SubSchedule
+        SET
+            title = #{title},
+            description = #{description},
+            start_time = #{startTime},
+            end_time = #{endTime},
+            is_completed = #{isCompleted},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE sub_schedule_id = #{subScheduleId}
+    </update>
+
+    <!-- DELETE: 소일정 삭제 -->
+    <delete id="deleteSubSchedule" parameterType="String">
+        DELETE FROM SubSchedule
+        WHERE title = #{subScheduleTitle}
+        LIMIT 1
+    </delete>
+
+    <!-- SubSchedule 조회 -->
+    <select id="selectSubSchedulesByMainScheduleIdAndDateRange" parameterType="map" resultType="SubScheduleEntity">
+        SELECT
+            sub_schedule_id AS subScheduleId,
+            main_schedule_id AS mainScheduleId,
+            title,
+            description,
+            start_time AS startTime,
+            end_time AS endTime,
+            is_completed AS isCompleted,
+            created_at AS createdAt,
+            updated_at AS updatedAt
+        FROM SubSchedule
+        WHERE
+        main_schedule_id = #{mainScheduleId}
+        AND (
+        (start_time BETWEEN #{startDate} AND #{endDate})
+        OR
+        (end_time BETWEEN #{startDate} AND #{endDate})
+        )
+    </select>
+
+
+
+
+</mapper>

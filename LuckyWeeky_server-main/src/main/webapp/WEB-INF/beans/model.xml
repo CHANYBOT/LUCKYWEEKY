@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+    <bean class="io.ssafy.luckyweeky.user.infrastructure.repository.UserRepository" id="userRepository"/>
+    <bean class="io.ssafy.luckyweeky.user.application.service.UserService" id="userService"/>
+    <bean class="io.ssafy.luckyweeky.schedule.infrastructure.repository.ScheduleRepository" id="scheduleRepository"/>
+    <bean class="io.ssafy.luckyweeky.schedule.application.service.ScheduleService" id="scheduleService"/>
+    <bean class="io.ssafy.luckyweeky.scheduleAi.application.service.ChatgptService" id="chatgptService"/>
+    <bean class="io.ssafy.luckyweeky.scheduleAi.application.service.ScheduleAiService" id="scheduleAiService" />
+    <bean class="io.ssafy.luckyweeky.scheduleAi.application.service.ClovaService" id="clovaService" />
+</beans>

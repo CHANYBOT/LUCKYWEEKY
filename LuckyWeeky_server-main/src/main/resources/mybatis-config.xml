@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!-- MyBatis 설정 -->
+    <settings>
+        <!--        <setting name="logImpl" value="STDOUT_LOGGING"/>-->
+        <!-- Snake 표기법을 Camel 표기법으로 자동 매핑 -->
+        <setting name="mapUnderscoreToCamelCase" value="true" />
+    </settings>
+    <!-- Type Alias 설정 -->
+    <typeAliases>
+        <package name="io.ssafy.luckyweeky.user.domain.model" />
+        <package name="io.ssafy.luckyweeky.schedule.domain.model" />
+    </typeAliases>
+
+    <!-- 환경 설정 -->
+    <environments default="default">
+        <environment id="default">
+            <transactionManager type="JDBC" />
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.cj.jdbc.Driver" />
+                <property name="url" value="${DB_URL}" />
+                <property name="username" value="${DB_USERNAME}" />
+                <property name="password" value="${DB_PASSWORD}" />
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!-- 매퍼 설정 -->
+    <mappers>
+        <mapper resource="mappers/UserMapper.xml" />
+        <mapper resource="mappers/SubScheduleMapper.xml" />
+        <mapper resource="mappers/MainScheduleMapper.xml" />
+    </mappers>
+</configuration>
